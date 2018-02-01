@@ -1,0 +1,17 @@
+require: rubocop-rspec
+AllCops:
+  TargetRubyVersion: 2.3
+Metrics/BlockLength:
+  Exclude:
+    - boton.gemspec
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'spec/**/*_spec.rb'
+Metrics/LineLength:
+  Max: 100
+Style/Documentation:
+  Exclude:
+    - 'spec/**/*'
+RSpec/FilePath:
+  CustomTransform:
+    APIs: apis

@@ -1,0 +1,4 @@
+coverage/
+.byebug_history
+kong*.gem
+Gemfile.lock
