@@ -1,8 +1,19 @@
 language: ruby
 rvm:
-  - 2.1.9
-  - 2.2.5
-  - 2.3.1
-  - 2.4.3
+- 2.1.9
+- 2.2.5
+- 2.3.1
+- 2.4.3
 cache: bundler
 script: bundle install && bundle exec rspec spec/
+before_deploy: bundle exec rake build
+deploy:
+  provider: releases
+  api_key:
+    secure: OLFtTtucuqURFLnuLPejL/SFbv6nCTPkQQkxiNh1epMrlmEm1qzLO+oDYS0XIsS/kcU36Yil9Oo5sL8KvOPtjI7GIfsQTNyACe4vtuxNOlXPvf4+z1xKm5aiFUFwtFhlmio757j9f8FbntTRu5cqNmthViJxYTINWXYKjTt4oAZFnICaUMEuceNY2xl7JhKRYKHOXQ8UUsnw8qPWVeelasFmw6UFIvNLxOTHfvVKVR22WrBrG3Pbb4aRgfH7icWrcOyRcrzVbOlI4s7Hd7UAmNc06Q77DZw5jr3U+9sZOjB0LYvVXx8Zonef0GdKdV1suXGddfI4thfpSSNiwGW42lICirbV4/fAosuzTR9+2L92htseNaOdntiq1jJ7SDxXodhXXYv1/LIOl+cFkWCGjcY2QfxU2XZHAy8KYezQFg7Urv2ErcdV83ln8e944VldFE/l8mH9PcWnymraH2wcSjGPNLVIWrByM0OeYjA/y27TE4qRifOgUPfoGEH7ViOiiHPTmqgLrzpYTIN9HqK5388/ei+g8BRpWjmVJxPrjKisCdmdpL8ucsvjnXmnSgfgCpaEEJNRlBzOety4UM8vgqJj/10wVvycNE8+kx6XAdxMhpRT4tmz33kN5WUamzW1S3S25bICQureXpmnaHnTQCIm9sMH415GLFbSwLLyig8=
+  file_glob: true
+  file: pkg/*
+  skip_cleanup: true
+  on:
+    repo: nico-acidtango/kong-client
+    tags: true
