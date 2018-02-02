@@ -8,6 +8,7 @@ module Kong
     # client to manage apis
     class APIs < Base
       resources :apis, class_name: 'API'
+      searchable_by :id, :name, :upstream_url, :retries
     end
   end
 end

@@ -8,10 +8,11 @@ module Kong
     module ResourceConfigurationMethods
       def self.included(base)
         class <<base
-          attr_accessor :resource_name
+          attr_accessor :resource_name, :searchable_attributes
           attr_writer :resource_class_name
         end
         base.extend ClassMethods
+        base.include InstanceMethods
       end
 
       # class methods
@@ -25,6 +26,17 @@ module Kong
         def resource_class_name
           @resource_class_name ||=
             resource_name.to_s.sub(/s$/, '').split('_').collect(&:capitalize).join
+        end
+
+        def searchable_by(*attributes)
+          self.searchable_attributes = attributes
+        end
+      end
+
+      # instance methods
+      module InstanceMethods
+        def searchable_attributes
+          self.class.searchable_attributes
         end
       end
     end

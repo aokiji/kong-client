@@ -137,6 +137,18 @@ RSpec.describe Kong::Clients::Consumers do
     end
   end
 
+  describe '#find_by' do
+    subject(:find_consumer) { client.find_by(custom_id: custom_id, created_at: 3) }
+
+    it_behaves_like 'find_by with match'
+    context 'with no match' do
+      include_context 'with empty consumer list response'
+      before { find_consumer }
+      it { is_expected.to be_nil }
+      it { expect(connection).to have_received(:get) }
+    end
+  end
+
   describe '#find_by!' do
     subject(:find_consumer) { client.find_by!(custom_id: custom_id) }
 

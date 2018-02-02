@@ -11,6 +11,7 @@ module Kong
     # consumers client
     class Consumers < Base
       resources :consumers
+      searchable_by :id, :custom_id, :username
 
       def basic_auth(consumer)
         Plugins::BasicAuth.new(connection, base_path: resource_path(consumer.id))

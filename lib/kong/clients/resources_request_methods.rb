@@ -29,15 +29,26 @@ module Kong
       end
 
       def find_by(options)
-        all(options).first
+        all(extract_searchable_attributes(options)).first
       end
 
       def find_by!(options)
-        all(options).first || raise(Kong::Error.new(404, 'Resource not found'))
+        all(extract_searchable_attributes(options)).first ||
+          raise(Kong::Error.new(404, 'Resource not found'))
       end
 
       def find_or_create_by(attributes, &block)
-        find_by(attributes) || create(attributes, &block)
+        find_by(extract_searchable_attributes(attributes)) ||
+          create(attributes, &block)
+      end
+
+      def extract_searchable_attributes(attributes)
+        return attributes unless searchable_attributes
+        result = {}
+        searchable_attributes.each do |key|
+          result[key] = attributes[key] if attributes.include?(key)
+        end
+        result
       end
     end
   end

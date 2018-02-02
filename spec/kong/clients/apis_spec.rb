@@ -131,6 +131,18 @@ RSpec.describe Kong::Clients::APIs do
     end
   end
 
+  describe '#find_by' do
+    subject(:find_api) { client.find_by(name: name, hosts: 'host') }
+
+    it_behaves_like 'find_by with match'
+    context 'with no match' do
+      include_context 'with empty api list response'
+      before { find_api }
+      it { is_expected.to be_nil }
+      it { expect(connection).to have_received(:get) }
+    end
+  end
+
   describe '#find_by!' do
     subject(:find_api) { client.find_by!(name: name) }
 

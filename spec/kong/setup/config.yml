@@ -1,0 +1,50 @@
+default: &default
+  admin-api:
+    url: http://kong:8001/admin-api
+    headers:
+      apikey: <%= %w[a p i k e y].join('') %>
+  apis:
+    api1: &api1
+      name: api1.v1
+      version: v1
+      upstream_url: http://app1
+      strip_uri: false
+      endpoints:
+        - admins
+        - roles
+    api2: &api2
+      name: api2.v1
+      version: v1
+      upstream_url: http://app2
+      strip_uri: false
+      endpoints:
+        - auth
+  plugins:
+    basic-auth:
+    jwt:
+      config:
+        claims_to_verify: exp
+
+development:
+  <<: *default
+  admin-api:
+    url: http://kong:8001
+  apis:
+    api1:
+      <<: *api1
+      upstream_url: http://app1:3000
+    api2:
+      <<: *api2
+      upstream_url: http://app2:3000
+  consumers:
+    - custom_id: 1
+      basic-auth:
+        username: cons
+        password: umer
+
+production:
+  <<: *default
+
+staging:
+  <<: *default
+
