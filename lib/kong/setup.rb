@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-require 'setup/configuration'
-require 'setup/runner'
+require_relative 'setup/configuration'
+require_relative 'setup/runner'

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'kong/setup/runner'
-require 'kong/setup/configuration'
+require 'kong/setup'
 
 RSpec.describe Kong::Setup::Runner do
   subject(:runner) { described_class.new(config) }
