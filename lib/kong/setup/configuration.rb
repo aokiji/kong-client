@@ -2,6 +2,7 @@
 
 require_relative 'configuration/api'
 require_relative 'configuration/consumer'
+require_relative 'configuration/plugin'
 
 module Kong
   module Setup
@@ -46,10 +47,12 @@ module Kong
         end
 
         def self.wrap_plugins(value)
-          value.keys.select { |key| key.include? '-' }.each do |key|
-            value[key.tr('-', '_')] = value.delete(key) || {}
+          plugins_wrapping = OpenStruct.new
+          value.to_h.each do |key, plugin_config|
+            new_key = key.tr('-', '_')
+            plugins_wrapping[new_key] = Plugin.new(key, plugin_config)
           end
-          OpenStruct.new(value)
+          plugins_wrapping
         end
       end
     end

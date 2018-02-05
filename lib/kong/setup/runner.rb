@@ -15,6 +15,7 @@ module Kong
       def apply
         setup_consumers
         setup_apis
+        setup_plugins
       end
 
       def self.apply(configs)
@@ -61,6 +62,16 @@ module Kong
         config_hash = api_config.to_hash
         api = apis_client.find_or_create_by(config_hash)
         apis_client.update(api, config_hash)
+      end
+
+      def setup_plugins
+        config.plugins.to_h.each_value do |plugin_config|
+          setup_plugin(plugin_config)
+        end
+      end
+
+      def setup_plugin(plugin_config)
+        client.plugins.find_or_create_by(plugin_config.to_hash)
       end
     end
   end

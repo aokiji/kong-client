@@ -37,8 +37,8 @@ RSpec.describe Kong::Setup::Configuration do
     let(:basic_auth) { {} }
     let(:jwt_config) { { 'config' => { 'claims_to_verify' => 'exp' } } }
 
-    it { expect(config.plugins.basic_auth).to eq(basic_auth) }
-    it { expect(config.plugins.jwt).to eq(jwt_config) }
+    it { expect(config.plugins.basic_auth).to have_attributes(name: 'basic-auth') }
+    it { expect(config.plugins.jwt).to have_attributes(name: 'jwt', config: jwt_config['config']) }
   end
 
   describe '#consumers' do
@@ -70,8 +70,11 @@ RSpec.describe Kong::Setup::Configuration do
       expect(api2).to have_attributes(name: 'api2.v1', version: 'v1', strip_uri: false,
                                       upstream_url: 'http://app2:3000', endpoints: %w[auth])
     end
-    it { expect(config.plugins.basic_auth).to eq({}) }
-    it { expect(config.plugins.jwt).to eq('config' => { 'claims_to_verify' => 'exp' }) }
+    it { expect(config.plugins.basic_auth).to have_attributes(name: 'basic-auth') }
+    it do
+      expect(config.plugins.jwt)
+        .to have_attributes(name: 'jwt', config: { 'claims_to_verify' => 'exp' })
+    end
     it { expect(consumers).to match_array(have_attributes(custom_id: 1, basic_auth: basic_auth)) }
   end
 end

@@ -8,6 +8,7 @@ module Kong
     # consumers client
     class Plugin < Base
       resources :plugins
+      searchable_by :name
     end
   end
 end

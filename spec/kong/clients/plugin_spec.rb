@@ -131,6 +131,12 @@ RSpec.describe Kong::Clients::Plugin do
     end
   end
 
+  describe '#find_by' do
+    subject(:find_plugin) { client.find_by(name: name, config: { extra: 'true' }) }
+
+    it_behaves_like 'find_by with match'
+  end
+
   describe '#find_by!' do
     subject(:find_plugin) { client.find_by!(name: name) }
 

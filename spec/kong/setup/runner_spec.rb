@@ -12,12 +12,14 @@ RSpec.describe Kong::Setup::Runner do
   let(:consumers_client) { instance_spy Kong::Clients::Consumers }
   let(:apis_client) { instance_spy Kong::Clients::APIs }
   let(:basic_auth_client) { instance_spy Kong::Clients::Plugins::BasicAuth }
+  let(:plugins_client) { instance_spy Kong::Clients::Plugin }
 
   before do
     runner.instance_variable_set(:@client, client)
     allow(client).to receive(:consumers).and_return(consumers_client)
     allow(client).to receive(:apis).and_return(apis_client)
     allow(consumers_client).to receive(:basic_auth).and_return(basic_auth_client)
+    allow(client).to receive(:plugins).and_return(plugins_client)
   end
 
   describe '#apply' do
@@ -49,6 +51,13 @@ RSpec.describe Kong::Setup::Runner do
       expect(apis_client).to have_received(:update)
         .with(any_args, 'name' => 'api2.v1', 'strip_uri' => false,
                         'upstream_url' => 'http://app2:3000', 'uris' => '/v1/auth')
+    end
+    it do
+      expect(plugins_client).to have_received(:find_or_create_by).with('name' => 'basic-auth')
+    end
+    it do
+      expect(plugins_client).to have_received(:find_or_create_by)
+        .with('name' => 'jwt', 'config' => { 'claims_to_verify' => 'exp' })
     end
   end
 end
