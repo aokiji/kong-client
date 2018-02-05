@@ -9,6 +9,7 @@ module Kong
       # basic auth client
       class BasicAuth < Clients::Base
         resources :basic_auth
+        searchable_by :id, :consumer_id, :username
       end
     end
   end

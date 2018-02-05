@@ -9,6 +9,7 @@ module Kong
       # basic auth client
       class JWT < Clients::Base
         resources :jwt, class_name: 'JWT'
+        searchable_by :id, :key, :consumer_id
       end
     end
   end
