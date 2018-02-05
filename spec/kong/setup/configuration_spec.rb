@@ -75,6 +75,9 @@ RSpec.describe Kong::Setup::Configuration do
       expect(config.plugins.jwt)
         .to have_attributes(name: 'jwt', config: { 'claims_to_verify' => 'exp' })
     end
-    it { expect(consumers).to match_array(have_attributes(custom_id: 1, basic_auth: basic_auth)) }
+    it do
+      expect(consumers).to match_array([have_attributes(custom_id: 1, basic_auth: basic_auth),
+                                        have_attributes(username: 'anonymous')])
+    end
   end
 end

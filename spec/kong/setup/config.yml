@@ -21,6 +21,9 @@ default: &default
         - auth
   plugins:
     basic-auth:
+      config:
+        anonymous:
+          username: anonymous
     jwt:
       config:
         claims_to_verify: exp
@@ -41,6 +44,7 @@ development:
       basic-auth:
         username: cons
         password: umer
+    - username: 'anonymous'
 
 production:
   <<: *default

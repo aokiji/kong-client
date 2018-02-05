@@ -13,12 +13,16 @@ RSpec.describe Kong::Setup::Runner do
   let(:apis_client) { instance_spy Kong::Clients::APIs }
   let(:basic_auth_client) { instance_spy Kong::Clients::Plugins::BasicAuth }
   let(:plugins_client) { instance_spy Kong::Clients::Plugin }
+  let(:anonymous_id) { SecureRandom.uuid }
+  let(:anonymous) { Kong::Resources::Consumer.new(id: anonymous_id, username: 'anonymous') }
 
   before do
     runner.instance_variable_set(:@client, client)
     allow(client).to receive(:consumers).and_return(consumers_client)
     allow(client).to receive(:apis).and_return(apis_client)
     allow(consumers_client).to receive(:basic_auth).and_return(basic_auth_client)
+    allow(consumers_client).to receive(:find_by).with('username' => 'anonymous')
+                                                .and_return(anonymous)
     allow(client).to receive(:plugins).and_return(plugins_client)
   end
 
@@ -53,7 +57,8 @@ RSpec.describe Kong::Setup::Runner do
                         'upstream_url' => 'http://app2:3000', 'uris' => '/v1/auth')
     end
     it do
-      expect(plugins_client).to have_received(:find_or_create_by).with('name' => 'basic-auth')
+      expect(plugins_client).to have_received(:find_or_create_by)
+        .with('name' => 'basic-auth', 'config' => { 'anonymous' => anonymous_id })
     end
     it do
       expect(plugins_client).to have_received(:find_or_create_by)

@@ -71,7 +71,12 @@ module Kong
       end
 
       def setup_plugin(plugin_config)
-        client.plugins.find_or_create_by(plugin_config.to_hash)
+        config = plugin_config.to_hash
+        anonymous_config = config.fetch('config', {})['anonymous']
+        if anonymous_config.is_a?(Hash)
+          config['config']['anonymous'] = client.consumers.find_by(anonymous_config).id
+        end
+        client.plugins.find_or_create_by(config)
       end
     end
   end
