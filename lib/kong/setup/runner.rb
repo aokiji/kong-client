@@ -26,7 +26,7 @@ module Kong
       private
 
       def client
-        @client ||= Kong::Client.new(config.admin_api)
+        @client ||= Kong::Client.new(config.admin_api.to_h)
       end
 
       def apis_client
