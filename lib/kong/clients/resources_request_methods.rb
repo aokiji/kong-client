@@ -42,11 +42,15 @@ module Kong
           create(attributes, &block)
       end
 
+      # :reek:TooManyStatements
+      # :reek:FeatureEnvy
       def extract_searchable_attributes(attributes)
         return attributes unless searchable_attributes
         result = {}
         searchable_attributes.each do |key|
           result[key] = attributes[key] if attributes.include?(key)
+          string_key = key.to_s
+          result[key] = attributes[string_key] if attributes.include?(string_key)
         end
         result
       end
