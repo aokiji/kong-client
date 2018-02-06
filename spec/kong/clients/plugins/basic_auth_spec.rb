@@ -107,7 +107,7 @@ RSpec.describe Kong::Clients::Plugins::BasicAuth do
   shared_examples 'find_by with match' do
     before do
       allow(connection).to receive(:get)
-        .with(basic_auths_path, password: password)
+        .with(basic_auths_path, username: username)
         .and_return('total' => 1, 'data' => [{
                       'id' => basic_auth_id, 'password' => password, 'username' => username
                     }])
@@ -121,12 +121,12 @@ RSpec.describe Kong::Clients::Plugins::BasicAuth do
   shared_context 'with empty basic_auth list response' do
     before do
       allow(connection).to receive(:get)
-        .with(basic_auths_path, password: password).and_return('total' => 0, 'data' => [])
+        .with(basic_auths_path, username: username).and_return('total' => 0, 'data' => [])
     end
   end
 
   describe '#find_by' do
-    subject(:find_basic_auth) { client.find_by(password: password) }
+    subject(:find_basic_auth) { client.find_by(username: username) }
 
     it_behaves_like 'find_by with match'
     context 'with no match' do
@@ -138,7 +138,7 @@ RSpec.describe Kong::Clients::Plugins::BasicAuth do
   end
 
   describe '#find_by!' do
-    subject(:find_basic_auth) { client.find_by!(password: password) }
+    subject(:find_basic_auth) { client.find_by!(username: username) }
 
     it_behaves_like 'find_by with match'
     context 'with no match' do
@@ -148,20 +148,20 @@ RSpec.describe Kong::Clients::Plugins::BasicAuth do
   end
 
   describe '#find_by_or_create_by' do
-    subject(:find_basic_auth) { client.find_or_create_by(password: password) }
+    subject(:find_basic_auth) { client.find_or_create_by(username: username) }
 
     it_behaves_like 'find_by with match'
 
     context 'with no match and no block' do
       let(:basic_auth) do
-        Kong::Resources::Plugins::BasicAuth.new(id: basic_auth_id, password: password)
+        Kong::Resources::Plugins::BasicAuth.new(id: basic_auth_id, username: username)
       end
 
       include_context 'with empty basic_auth list response'
       before do
         allow(connection).to receive(:create)
-          .with(basic_auths_path, 'password' => password)
-          .and_return(id: basic_auth_id, password: password)
+          .with(basic_auths_path, 'username' => username)
+          .and_return(id: basic_auth_id, username: username)
         find_basic_auth
       end
       it { expect(connection).to have_received(:create) }
@@ -170,8 +170,8 @@ RSpec.describe Kong::Clients::Plugins::BasicAuth do
 
     context 'with no match and block' do
       subject(:find_basic_auth) do
-        client.find_or_create_by(password: password) do |basic_auth|
-          basic_auth.username = username
+        client.find_or_create_by(username: username) do |basic_auth|
+          basic_auth.password = password
         end
       end
 
