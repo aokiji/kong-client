@@ -1,0 +1,46 @@
+config1: &config1
+  admin-api:
+    url: http://kong:8001
+    headers:
+      apikey: <%= %w[a p i k e y].join('') %>
+  apis:
+    api2:
+      name: api2.v1
+      version: v1
+      upstream_url: http://app2
+      strip_uri: false
+      endpoints:
+        - auth
+  plugins:
+    basic-auth:
+      config:
+        anonymous:
+          username: anonymous
+config2: &config2
+  admin-api:
+    url: http://kong:8001/admin-api
+  apis:
+    api1:
+      name: api1.v1
+      version: v1
+      upstream_url: http://app1
+      strip_uri: false
+      endpoints:
+        - admins
+        - roles
+  plugins:
+    basic-auth:
+      config:
+        anonymous:
+          username: anonymous
+
+default: &default
+  - *config1
+  - *config2
+
+development: *default
+
+production: *default
+
+staging: *default
+

@@ -54,30 +54,60 @@ RSpec.describe Kong::Setup::Configuration do
   end
 
   describe ':from_file' do
-    subject(:config) { described_class.from_file('spec/kong/setup/config.yml', :development) }
+    describe 'one configuration instance' do
+      subject(:config) { described_class.from_file('spec/kong/setup/config.yml', :development) }
 
-    let(:api1) { config.apis.api1 }
-    let(:api2) { config.apis.api2 }
-    let(:consumers) { config.consumers }
-    let(:basic_auth) { { 'username' => 'cons', 'password' => 'umer' } }
+      let(:api1) { config.apis.api1 }
+      let(:api2) { config.apis.api2 }
+      let(:consumers) { config.consumers }
+      let(:basic_auth) { { 'username' => 'cons', 'password' => 'umer' } }
 
-    it { expect(config.admin_api).to have_attributes(url: 'http://kong:8001') }
-    it do
-      expect(api1).to have_attributes(name: 'api1.v1', version: 'v1', strip_uri: false,
-                                      upstream_url: 'http://app1:3000', endpoints: %w[admins roles])
+      it { expect(config.admin_api).to have_attributes(url: 'http://kong:8001') }
+      it do
+        expect(api1).to have_attributes(name: 'api1.v1', version: 'v1', strip_uri: false,
+                                        upstream_url: 'http://app1:3000',
+                                        endpoints: %w[admins roles])
+      end
+      it do
+        expect(api2).to have_attributes(name: 'api2.v1', version: 'v1', strip_uri: false,
+                                        upstream_url: 'http://app2:3000', endpoints: %w[auth])
+      end
+      it { expect(config.plugins.basic_auth).to have_attributes(name: 'basic-auth') }
+      it do
+        expect(config.plugins.jwt)
+          .to have_attributes(name: 'jwt', config: { 'claims_to_verify' => 'exp' })
+      end
+      it do
+        expect(consumers).to match_array([have_attributes(custom_id: 1, basic_auth: basic_auth),
+                                          have_attributes(username: 'anonymous')])
+      end
     end
-    it do
-      expect(api2).to have_attributes(name: 'api2.v1', version: 'v1', strip_uri: false,
-                                      upstream_url: 'http://app2:3000', endpoints: %w[auth])
-    end
-    it { expect(config.plugins.basic_auth).to have_attributes(name: 'basic-auth') }
-    it do
-      expect(config.plugins.jwt)
-        .to have_attributes(name: 'jwt', config: { 'claims_to_verify' => 'exp' })
-    end
-    it do
-      expect(consumers).to match_array([have_attributes(custom_id: 1, basic_auth: basic_auth),
-                                        have_attributes(username: 'anonymous')])
+
+    describe 'multiple configuration instance' do
+      subject(:config) { described_class.from_file('spec/kong/setup/config2.yml', :development) }
+
+      let(:api1) { config[1].apis.api1 }
+      let(:api2) { config[0].apis.api2 }
+      let(:basic_auth) { { 'username' => 'cons', 'password' => 'umer' } }
+
+      it { is_expected.to be_a(Array).and have_attributes(length: 2)  }
+
+      it do
+        expect(config[0].admin_api)
+          .to have_attributes(url: 'http://kong:8001', headers: { 'apikey' => 'apikey' })
+      end
+      it { expect(config[1].admin_api).to have_attributes(url: 'http://kong:8001/admin-api') }
+      it do
+        expect(api1).to have_attributes(name: 'api1.v1', version: 'v1', strip_uri: false,
+                                        upstream_url: 'http://app1',
+                                        endpoints: %w[admins roles])
+      end
+      it do
+        expect(api2).to have_attributes(name: 'api2.v1', version: 'v1', strip_uri: false,
+                                        upstream_url: 'http://app2', endpoints: %w[auth])
+      end
+      it { expect(config[0].plugins.basic_auth).to have_attributes(name: 'basic-auth') }
+      it { expect(config[1].plugins.basic_auth).to have_attributes(name: 'basic-auth') }
     end
   end
 end

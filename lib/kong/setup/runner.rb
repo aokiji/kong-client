@@ -8,7 +8,7 @@ module Kong
     class Runner
       attr_reader :config
 
-      CONSUMER_AUTH_TYPES = %w[basic_auth jwt]
+      CONSUMER_AUTH_TYPES = %w[basic_auth jwt].freeze
 
       def initialize(config)
         @config = config

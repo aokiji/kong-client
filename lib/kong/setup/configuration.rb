@@ -21,6 +21,7 @@ module Kong
       def self.from_file(file_name, key = nil)
         file_config = YAML.safe_load(ERB.new(File.read(file_name)).result, [], [], true)
         file_config = file_config.fetch(key.to_s) if key
+        return file_config.map { |conf| new conf } if file_config.is_a? Array
         new file_config
       end
 
