@@ -8,6 +8,8 @@ module Kong
     class Runner
       attr_reader :config
 
+      CONSUMER_AUTH_TYPES = %w[basic_auth jwt]
+
       def initialize(config)
         @config = config
       end
@@ -40,12 +42,14 @@ module Kong
       end
 
       def setup_consumer(consumer_config)
-        consumer = client.consumers.find_or_create_by(consumer_config.to_hash)
+        config_hash = consumer_config.to_hash
+        CONSUMER_AUTH_TYPES.each { |type| config_hash.delete(type) }
+        consumer = client.consumers.find_or_create_by(config_hash)
         setup_consumer_auth(consumer, consumer_config)
       end
 
       def setup_consumer_auth(consumer, consumer_config)
-        %w[basic_auth jwt].each do |auth_type|
+        CONSUMER_AUTH_TYPES.each do |auth_type|
           auth_config = consumer_config.public_send(auth_type)
           next unless auth_config
           client.consumers.public_send(auth_type, consumer).find_or_create_by(auth_config)

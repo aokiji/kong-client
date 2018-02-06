@@ -29,7 +29,7 @@ RSpec.describe Kong::Setup::Runner do
     before { runner.apply }
 
     it do
-      expect(consumers_client).to have_received(:find_or_create_by).with(include('custom_id' => 1))
+      expect(consumers_client).to have_received(:find_or_create_by).with('custom_id' => 1)
     end
     it do
       expect(basic_auth_client).to have_received(:find_or_create_by)
