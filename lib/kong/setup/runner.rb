@@ -57,7 +57,7 @@ module Kong
       end
 
       def setup_apis
-        config.apis.to_h.each_value do |api_config|
+        config.apis.each do |api_config|
           setup_api(api_config)
         end
       end
@@ -69,7 +69,7 @@ module Kong
       end
 
       def setup_plugins
-        config.plugins.to_h.each_value do |plugin_config|
+        config.plugins.each do |plugin_config|
           setup_plugin(plugin_config)
         end
       end

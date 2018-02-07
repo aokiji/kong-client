@@ -11,10 +11,11 @@ module Kong
       attr_accessor :admin_api, :apis, :plugins, :consumers
 
       def initialize(hash)
+        set_defaults
         hash.each do |key, value|
           method = key.tr('-', '_')
-          method << '='
-          public_send(method, Utils.wrap_value_type(key, value))
+          method << '_from_hash='
+          send(method, value)
         end
       end
 
@@ -25,37 +26,30 @@ module Kong
         new file_config
       end
 
-      # utility module
-      module Utils
-        def self.wrap_value_type(key, value)
-          return public_send("wrap_#{key}", value) if %w[apis plugins consumers].include?(key)
-          wrap_value(value)
-        end
+      private
 
-        def self.wrap_value(value)
-          return value.map { |val| wrap_value(val) } if value.is_a?(Array)
-          OpenStruct.new(value)
-        end
+      def set_defaults
+        self.consumers = []
+        self.apis = []
+        self.plugins = []
+        self.admin_api = {}
+      end
 
-        def self.wrap_apis(value)
-          apis = OpenStruct.new
-          value.each { |name, api| apis[name] = API.new(api) }
-          apis
-        end
+      def consumers_from_hash=(consumers)
+        consumers.each { |consumer| self.consumers << Consumer.new(consumer) }
+      end
 
-        def self.wrap_consumers(consumers)
-          consumers.map { |consumer| Consumer.new(consumer) }
-        end
+      def apis_from_hash=(apis)
+        apis.each { |name, api| self.apis << API.new({ 'name' => name }.merge(api)) }
+      end
 
-        def self.wrap_plugins(value)
-          plugins_wrapping = OpenStruct.new
-          value.to_h.each do |key, plugin_config|
-            new_key = key.tr('-', '_')
-            plugins_wrapping[new_key] = Plugin.new(key, plugin_config)
-          end
-          plugins_wrapping
+      def plugins_from_hash=(plugins)
+        plugins.each do |key, plugin_config|
+          self.plugins << Plugin.new(key, plugin_config)
         end
       end
+
+      alias admin_api_from_hash= admin_api=
     end
   end
 end
