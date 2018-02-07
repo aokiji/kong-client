@@ -43,7 +43,7 @@ module Kong
       def client
         @client ||= begin
           admin_api_config = config.admin_api
-          logger.info "Connecting via #{admin_api_config}"
+          logger.info "Connecting via #{admin_api_config['url']}"
           Kong::Client.new(admin_api_config)
         end
       end
