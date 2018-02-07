@@ -1,23 +1,28 @@
 # frozen_string_literal: true
 
 require 'kong/client'
+require 'logger'
 
 module Kong
   module Setup
     # runs setup with given configuration
     class Runner
       attr_reader :config
+      attr_accessor :logger
 
       CONSUMER_AUTH_TYPES = %w[basic_auth jwt].freeze
 
-      def initialize(config)
+      def initialize(config, logger: Logger.new(STDOUT))
         @config = config
+        @logger = logger
       end
 
       def apply
+        logger.info 'Starting setup'
         setup_consumers
         setup_apis
         setup_plugins
+        logger.info 'Finished setup'
       end
 
       def self.apply(configs)
@@ -28,7 +33,11 @@ module Kong
       private
 
       def client
-        @client ||= Kong::Client.new(config.admin_api.to_h)
+        @client ||= begin
+          admin_api_config = config.admin_api
+          logger.info "Connecting via #{admin_api_config}"
+          Kong::Client.new(admin_api_config)
+        end
       end
 
       def apis_client
@@ -36,6 +45,7 @@ module Kong
       end
 
       def setup_consumers
+        logger.info 'Configuring consumers'
         config.consumers.each do |consumer_config|
           setup_consumer(consumer_config)
         end
@@ -57,7 +67,9 @@ module Kong
       end
 
       def setup_apis
+        logger.info 'Configuring apis'
         config.apis.each do |api_config|
+          logger.info "  * #{api_config.name}"
           setup_api(api_config)
         end
       end
@@ -69,7 +81,9 @@ module Kong
       end
 
       def setup_plugins
+        logger.info 'Configuring plugins'
         config.plugins.each do |plugin_config|
+          logger.info "  * #{plugin_config.name}"
           setup_plugin(plugin_config)
         end
       end
