@@ -42,12 +42,28 @@ RSpec.describe Kong::Setup::Configuration do
   end
 
   describe '#plugins' do
-    let(:config_hash) { { 'plugins' => { 'basic-auth' => basic_auth, 'jwt' => jwt_config } } }
-    let(:basic_auth) { {} }
-    let(:jwt_config) { { 'config' => { 'claims_to_verify' => 'exp' } } }
+    describe 'basic-auth' do
+      let(:config_hash) { { 'plugins' => { 'basic-auth' => { 'config' => auth_config } } } }
+      let(:auth_config) { { 'anonymous' => '1' } }
 
-    it { expect(config.plugins[0]).to have_attributes(name: 'basic-auth') }
-    it { expect(config.plugins[1]).to have_attributes(name: 'jwt', config: jwt_config['config']) }
+      it { expect(config.plugins[0]).to have_attributes(name: 'basic-auth', config: auth_config) }
+    end
+
+    describe 'jwt' do
+      let(:config_hash) { { 'plugins' => { 'jwt' => { 'config' => auth_config } } } }
+      let(:auth_config) { { 'claims_to_verify' => 'exp' } }
+
+      it { expect(config.plugins[0]).to have_attributes(name: 'jwt', config: auth_config) }
+    end
+
+    describe 'multiple plugins configuration' do
+      let(:config_hash) { { 'plugins' => { 'basic-auth' => basic_auth, 'jwt' => jwt_config } } }
+      let(:basic_auth) { {} }
+      let(:jwt_config) { { 'config' => { 'claims_to_verify' => 'exp' } } }
+
+      it { expect(config.plugins[0]).to have_attributes(name: 'basic-auth') }
+      it { expect(config.plugins[1]).to have_attributes(name: 'jwt', config: jwt_config['config']) }
+    end
   end
 
   describe '#consumers' do
