@@ -24,6 +24,10 @@ module Kong
       Kong::Clients::Plugin.new(@connection)
     end
 
+    def log_requests(*args)
+      @connection.log_requests(*args)
+    end
+
     protected
 
     attr_reader :connection

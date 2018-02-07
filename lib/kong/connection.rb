@@ -59,5 +59,15 @@ module Kong
       response = @http_client.delete(*args)
       ResponseHandler.new(response, expected_status: 204).status_ok?
     end
+
+    def log_requests(*args)
+      @http_client.builder.build do |connection|
+        connection.instance_eval do
+          request :url_encoded
+          response :logger, *args
+          adapter Faraday.default_adapter
+        end
+      end
+    end
   end
 end

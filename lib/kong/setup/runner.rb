@@ -8,7 +8,7 @@ module Kong
     # runs setup with given configuration
     class Runner
       attr_reader :config
-      attr_accessor :logger
+      attr_accessor :logger, :log_request
 
       CONSUMER_AUTH_TYPES = %w[basic_auth jwt].freeze
 
@@ -27,7 +27,15 @@ module Kong
 
       def self.apply(configs)
         configs = [configs] unless configs.is_a?(Array)
-        configs.each { |config| Runner.new(config).apply }
+        configs.each do |config|
+          runner = Runner.new(config)
+          yield(runner) if block_given?
+          runner.apply
+        end
+      end
+
+      def log_requests
+        client.log_requests(logger)
       end
 
       private
