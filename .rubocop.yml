@@ -15,3 +15,6 @@ Style/Documentation:
 RSpec/FilePath:
   CustomTransform:
     APIs: apis
+RSpec/VoidExpect:
+  Exclude:
+    - 'spec/support/*.rb'

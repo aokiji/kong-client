@@ -26,41 +26,41 @@ RSpec.describe Kong::Setup::Runner do
   end
 
   describe '#apply' do
-    before { runner.apply }
+    subject { runner.apply }
 
     it do
-      expect(consumers_client).to have_received(:find_or_create_by).with('custom_id' => 1)
+      causes(consumers_client).to have_received(:find_or_create_by).with('custom_id' => 1)
     end
     it do
-      expect(basic_auth_client).to have_received(:find_or_create_by)
+      causes(basic_auth_client).to have_received(:find_or_create_by)
         .with('username' => 'cons', 'password' => 'umer')
     end
     it do
-      expect(apis_client).to have_received(:find_or_create_by)
+      causes(apis_client).to have_received(:find_or_create_by)
         .with('name' => 'api1.v1', 'strip_uri' => false, 'upstream_url' => 'http://app1:3000',
               'uris' => '/v1/admins,/v1/roles')
     end
     it do
-      expect(apis_client).to have_received(:find_or_create_by)
+      causes(apis_client).to have_received(:find_or_create_by)
         .with('name' => 'api2.v1', 'strip_uri' => false, 'upstream_url' => 'http://app2:3000',
               'uris' => '/v1/auth')
     end
     it do
-      expect(apis_client).to have_received(:update)
+      causes(apis_client).to have_received(:update)
         .with(any_args, 'name' => 'api1.v1', 'strip_uri' => false,
                         'uris' => '/v1/admins,/v1/roles', 'upstream_url' => 'http://app1:3000')
     end
     it do
-      expect(apis_client).to have_received(:update)
+      causes(apis_client).to have_received(:update)
         .with(any_args, 'name' => 'api2.v1', 'strip_uri' => false,
                         'upstream_url' => 'http://app2:3000', 'uris' => '/v1/auth')
     end
     it do
-      expect(plugins_client).to have_received(:find_or_create_by)
+      causes(plugins_client).to have_received(:find_or_create_by)
         .with('name' => 'basic-auth', 'config' => { 'anonymous' => anonymous_id })
     end
     it do
-      expect(plugins_client).to have_received(:find_or_create_by)
+      causes(plugins_client).to have_received(:find_or_create_by)
         .with('name' => 'jwt', 'config' => { 'claims_to_verify' => 'exp' })
     end
   end

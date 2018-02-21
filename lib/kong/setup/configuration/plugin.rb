@@ -13,6 +13,13 @@ module Kong
           hash ||= {}
           super hash.merge(name: type)
         end
+
+        # :reek:FeatureEnvy
+        def to_hash
+          hash = super
+          hash['config'] = hash['config'].clone if hash.key?('config')
+          hash
+        end
       end
     end
   end
